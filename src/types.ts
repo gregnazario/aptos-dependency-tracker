@@ -81,3 +81,16 @@ export interface DependencyTraceResult {
  * Supported output formats.
  */
 export type OutputFormat = "json" | "table";
+
+export type TraceResult = {
+  packages: string[];
+  perPackage: DependencyTraceResult[];
+  combined: {
+    dependencyCount: number;
+    dedupedDependencyCount: number;
+    dependencies: string[];
+    moduleCount: number;
+    dedupedModuleCount: number;
+    modules: string[];
+  };
+};

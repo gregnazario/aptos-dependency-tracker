@@ -5,7 +5,7 @@
  * Now supports combined output for multiple packages.
  */
 
-import { DependencyTraceResult, OutputFormat } from "./types";
+import { DependencyTraceResult, OutputFormat, TraceResult } from "./types";
 import { renderAsciiTree } from "./graph";
 
 /**
@@ -13,7 +13,7 @@ import { renderAsciiTree } from "./graph";
  * @param result The DependencyTraceResult object.
  * @returns JSON string.
  */
-export function formatJson(result: DependencyTraceResult): string {
+export function formatJson(result: TraceResult): string {
   return JSON.stringify(result, null, 2);
 }
 
@@ -21,6 +21,8 @@ export function formatJson(result: DependencyTraceResult): string {
  * Formats the dependency trace result or combined output as a human-readable table string.
  * @param result The DependencyTraceResult object or combined output.
  * @returns Table string.
+ *
+ * TODO: Fix with new info
  */
 export function formatTable(result: any): string {
   // If result has perPackage, it's a combined output

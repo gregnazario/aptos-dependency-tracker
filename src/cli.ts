@@ -4,13 +4,13 @@
  */
 
 import { savePackageMetadataCache } from "./api";
-import { DependencyTraceResult } from "./types";
+import { DependencyTraceResult, TraceResult } from "./types";
 
 const HELP_TEXT = `
 Dependency Tracer CLI
 
 Usage:
-  pnpm run src/cli.ts <package_id> [options]
+  cli.ts <package_id> <package_id2> [options]
 
 Arguments:
   <package_id>         Package identifier in the format <address>::<PackageName>
@@ -24,9 +24,9 @@ Options:
   --help               Show this help message
 
 Examples:
-  pnpm run src/cli.ts 0x1::AptosFramework
-  pnpm run src/cli.ts 0x1::AptosFramework --format=table --tree
-  pnpm run src/cli.ts 0x1::AptosFramework --svg-tree
+  cli.js 0x1::AptosFramework
+  cli.js 0x1::AptosFramework --format=table --tree
+  cli.js 0x1::AptosFramework --svg-tree
 `;
 
 interface CLIOptions {
@@ -147,7 +147,7 @@ async function main() {
     );
 
     // Combined output object
-    const combinedOutput = {
+    const combinedOutput: TraceResult = {
       packages: options.packageIds,
       perPackage: traceResults,
       combined: {

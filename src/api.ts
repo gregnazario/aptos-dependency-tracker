@@ -104,8 +104,9 @@ export async function fetchPackageMetadata(
   }
 
   const cacheKey = `${network}::${address}::${name}`;
-  const cacheEntry = packageMetadataCache[cacheKey];
-  if (cacheEntry) {
+  const cacheEntry: PackageMetadataWithAddress | undefined =
+    packageMetadataCache[cacheKey];
+  if (cacheEntry !== undefined) {
     return cacheEntry;
   }
 
