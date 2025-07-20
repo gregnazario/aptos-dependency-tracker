@@ -2,15 +2,16 @@
  * Dependency Tracer CLI
  * Entry point for the Aptos Move package dependency tracer tool.
  */
+import { writeFileSync } from "fs";
 
 import { savePackageMetadataCache } from "./api";
 import { DependencyTraceResult, TraceResult } from "./types";
 
 const HELP_TEXT = `
-Dependency Tracer CLI
+Aptos Dependency Tracer CLI
 
 Usage:
-  cli.ts <package_id> <package_id2> [options]
+  cli.ts <package_id> <package_id2>... [options]
 
 Arguments:
   <package_id>         Package identifier in the format <address>::<PackageName>
@@ -166,8 +167,7 @@ async function main() {
     }
 
     // Write the output to a file
-    const fs = await import("fs");
-    fs.writeFileSync(outputFile, output, "utf8");
+    writeFileSync(outputFile, output, "utf8");
     console.log(`Dependency output written to ${outputFile}`);
     if (options.format === "json") {
       console.log(`Combined module count: ${combinedOutput.combined.moduleCount}`);
@@ -200,7 +200,7 @@ async function main() {
       // Wrap in one SVG
       svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="${yOffset}">\n${svg}</svg>\n`;
       const svgFile = "dependency_tree.svg";
-      fs.writeFileSync(svgFile, svg, "utf8");
+      writeFileSync(svgFile, svg, "utf8");
       console.log(`Dependency tree SVG written to ${svgFile}`);
     }
 

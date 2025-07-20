@@ -3,23 +3,23 @@
  * Uses @aptos-labs/ts-sdk.
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import { existsSync, readFileSync, writeFileSync } from "fs";
+import { resolve } from "path";
 
 import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 
 import { PackageMetadata, PackageMetadataWithAddress } from "./types";
 
 // Persistent disk cache for package metadata
-export const PACKAGE_METADATA_CACHE_FILE = path.resolve(process.cwd(), ".package_metadata.json");
+export const PACKAGE_METADATA_CACHE_FILE = resolve(process.cwd(), ".package_metadata.json");
 
 export let packageMetadataCache = new Map<string, PackageMetadataWithAddress>();
 
 // Load cache from disk on startup
 function loadPackageMetadataCache() {
   try {
-    if (fs.existsSync(PACKAGE_METADATA_CACHE_FILE)) {
-      const raw = fs.readFileSync(PACKAGE_METADATA_CACHE_FILE, "utf8");
+    if (existsSync(PACKAGE_METADATA_CACHE_FILE)) {
+      const raw = readFileSync(PACKAGE_METADATA_CACHE_FILE, "utf8");
       packageMetadataCache = JSON.parse(raw);
     }
   } catch (e: unknown) {
@@ -32,7 +32,7 @@ loadPackageMetadataCache();
 // Save cache to disk
 export function savePackageMetadataCache() {
   try {
-    fs.writeFileSync(
+    writeFileSync(
       PACKAGE_METADATA_CACHE_FILE,
       JSON.stringify(packageMetadataCache, null, 2),
       "utf8",
@@ -96,7 +96,7 @@ export async function fetchPackageMetadata(
   }
 
   const cacheKey = `${network}::${address}::${name}`;
-  const cacheEntry: PackageMetadataWithAddress | undefined = packageMetadataCache[cacheKey];
+  const cacheEntry: PackageMetadataWithAddress | undefined = packageMetadataCache.get(cacheKey);
   if (cacheEntry !== undefined) {
     return cacheEntry;
   }
@@ -137,7 +137,7 @@ export async function fetchPackageMetadata(
     ...pkgEntry,
   };
 
-  packageMetadataCache[cacheKey] = metadataWithAddress;
+  packageMetadataCache.set(cacheKey, metadataWithAddress);
   return metadataWithAddress;
 }
 
