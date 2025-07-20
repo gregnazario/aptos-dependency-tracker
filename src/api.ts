@@ -13,14 +13,19 @@ import { PackageMetadata, PackageMetadataWithAddress } from "./types";
 // Persistent disk cache for package metadata
 export const PACKAGE_METADATA_CACHE_FILE = resolve(process.cwd(), ".package_metadata.json");
 
-export let packageMetadataCache = new Map<string, PackageMetadataWithAddress>();
+export let packageMetadataCache: Map<string, PackageMetadataWithAddress> = new Map<
+  string,
+  PackageMetadataWithAddress
+>();
 
 // Load cache from disk on startup
 function loadPackageMetadataCache() {
   try {
     if (existsSync(PACKAGE_METADATA_CACHE_FILE)) {
       const raw = readFileSync(PACKAGE_METADATA_CACHE_FILE, "utf8");
-      packageMetadataCache = JSON.parse(raw);
+
+      const obj: Record<string, PackageMetadataWithAddress> = JSON.parse(raw);
+      packageMetadataCache = new Map(Object.entries(obj));
     }
   } catch (e: unknown) {
     console.error("Failed to load package metadata cache:", e);
@@ -34,7 +39,7 @@ export function savePackageMetadataCache() {
   try {
     writeFileSync(
       PACKAGE_METADATA_CACHE_FILE,
-      JSON.stringify(packageMetadataCache, null, 2),
+      JSON.stringify(Object.fromEntries(packageMetadataCache), null, 2),
       "utf8",
     );
   } catch (e: unknown) {
