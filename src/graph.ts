@@ -17,24 +17,24 @@ export function renderAsciiTree(
   tree: DependencyTreeNode,
   prefix: string = "",
   isLast: boolean = true,
+  ancestors: boolean[] = [],
 ): string {
   let output = "";
 
   // Draw the current node
-  output += prefix;
-  if (prefix.length > 0) {
+  if (ancestors.length > 0) {
+    for (let i = 0; i < ancestors.length - 1; i++) {
+      output += ancestors[i] ? "│   " : "    ";
+    }
     output += isLast ? "└── " : "├── ";
   }
   output += tree.name + "\n";
 
-  // Prepare prefix for children
-  const childPrefix = prefix + (prefix.length > 0 ? (isLast ? "    " : "│   ") : "");
-
-  // Render children
+  // Render children with correct branch lines
   const deps = tree.dependencies || [];
   deps.forEach((child, idx) => {
     const last = idx === deps.length - 1;
-    output += renderAsciiTree(child, childPrefix, last);
+    output += renderAsciiTree(child, prefix, last, [...ancestors, !last]);
   });
 
   return output;
