@@ -38,6 +38,7 @@ interface CLIOptions {
   network: "mainnet" | "testnet" | "devnet";
   help: boolean;
   svgTree: boolean;
+  moduleTree: boolean;
 }
 
 function parseArgs(argv: string[]): CLIOptions {
@@ -45,6 +46,7 @@ function parseArgs(argv: string[]): CLIOptions {
     packageIds: [],
     format: "json",
     tree: false,
+    moduleTree: false,
     dedupe: false,
     network: "mainnet",
     help: false,
@@ -91,6 +93,10 @@ function parseArgs(argv: string[]): CLIOptions {
         options.svgTree = true;
         i++;
         break;
+      case "--module-tree":
+        options.moduleTree = true;
+        i++;
+        break;
       case "--help":
         options.help = true;
         i++;
@@ -116,7 +122,7 @@ async function main() {
   // Dynamically import modules to avoid circular dependencies
   const { traceDependencies } = await import("./tracer");
   const { formatJson, formatTable, formatTree } = await import("./output");
-  const { renderDependencyTreeSvg } = await import("./graph");
+  const { renderDependencyTreeSvg, renderModuleTreeAscii } = await import("./graph");
 
   try {
     // Trace dependencies for each package
@@ -180,6 +186,15 @@ async function main() {
       for (const result of traceResults) {
         console.log(`\n${result.packageId}:`);
         console.log(formatTree(result));
+      }
+    }
+
+    // Optionally output the module tree as ASCII (forest)
+    if (options.moduleTree) {
+      console.log("\nModule Trees:");
+      for (const result of traceResults) {
+        console.log(`\n${result.packageId}:`);
+        console.log(renderModuleTreeAscii(result));
       }
     }
 

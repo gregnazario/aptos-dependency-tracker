@@ -2,12 +2,11 @@
  * Dependency tracing logic for the Dependency Tracer tool.
  * Recursively fetches and builds the dependency graph for a given package.
  *
- * NOTE: This is a stub implementation. Actual dependency resolution should use
- * real data from the API module.
+ * Also supports building a module-level dependency tree for --module-tree output.
  */
 
 import { fetchPackageMetadata } from "./api";
-import { DependencyTraceResult, DependencyTreeNode, CLIOptions } from "./types";
+import { DependencyTraceResult, DependencyTreeNode, CLIOptions, ModuleTreeNode } from "./types";
 
 /**
  * Recursively traces all dependencies for a given package.
@@ -25,7 +24,9 @@ export async function traceDependencies(
   const allModules: string[] = [];
   const dedupedModules = new Set<string>();
 
-  // Helper to recursively build the tree
+  let moduleTreeRoot: ModuleTreeNode | null = null;
+
+  // Helper to recursively build the package dependency tree
   async function buildTree(pkgId: string, visited: Set<string>): Promise<DependencyTreeNode> {
     // Prevent cycles
     if (visited.has(pkgId)) {
@@ -38,14 +39,12 @@ export async function traceDependencies(
 
     const pkgAddress = pkgId.split("::")[0];
 
-    // Fetch metadata (stub)
+    // Fetch metadata
     const metadata = await fetchPackageMetadata(pkgId, options.network);
 
     // Track dependencies
     for (const dep of metadata.deps) {
       const name = `${dep.account}::${dep.package_name}`;
-
-      // Note dependencies by Package vs module are different
       allDependencies.push(name);
       dedupedDependencies.add(name);
     }
@@ -53,8 +52,6 @@ export async function traceDependencies(
     // Track modules
     for (const module of metadata.modules) {
       const name = `${pkgAddress}::${module.name}`;
-
-      // Note dependencies by Package vs module are different
       allModules.push(name);
       dedupedModules.add(name);
     }
@@ -72,8 +69,47 @@ export async function traceDependencies(
     };
   }
 
+  // Helper to recursively build the module dependency tree
+  async function buildModuleTree(pkgId: string, visited: Set<string>): Promise<ModuleTreeNode> {
+    if (visited.has(pkgId)) {
+      return {
+        name: pkgId + " (cycle detected)",
+        children: [],
+      };
+    }
+    visited.add(pkgId);
+
+    const pkgAddress = pkgId.split("::")[0];
+    const metadata = await fetchPackageMetadata(pkgId, options.network);
+
+    // For each module in this package, build its dependency tree
+    const moduleNodes: ModuleTreeNode[] = [];
+    for (const module of metadata.modules) {
+      const moduleName = `${pkgAddress}::${module.name}`;
+      // If the module has explicit dependencies, you could fetch them here.
+      // For now, just show the module as a leaf.
+      moduleNodes.push({
+        name: moduleName,
+        children: [],
+      });
+    }
+
+    // For each dependency package, build its module tree as children
+    for (const dep of metadata.deps) {
+      const depPkgId = `${dep.account}::${dep.package_name}`;
+      const depModuleTree = await buildModuleTree(depPkgId, new Set(visited));
+      moduleNodes.push(depModuleTree);
+    }
+
+    return {
+      name: pkgId,
+      children: moduleNodes,
+    };
+  }
+
   // Start tracing from the root package
   const dependencyTree = await buildTree(packageId, new Set());
+  moduleTreeRoot = await buildModuleTree(packageId, new Set());
 
   return {
     packageId,
@@ -87,5 +123,6 @@ export async function traceDependencies(
     dedupedModuleList: Array.from(dedupedModules),
     allModuleCount: allModules.length,
     dedupedModuleCount: dedupedModules.size,
+    moduleTree: moduleTreeRoot,
   };
 }

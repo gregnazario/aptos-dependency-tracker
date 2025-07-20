@@ -4,7 +4,7 @@
  * Provides functions to render the dependency tree as ASCII for CLI output.
  */
 
-import { DependencyTreeNode } from "./types";
+import { DependencyTreeNode, ModuleTreeNode } from "./types";
 
 /**
  * Renders a dependency tree as an ASCII string.
@@ -38,6 +38,39 @@ export function renderAsciiTree(
   });
 
   return output;
+}
+
+/**
+ * Renders the module dependency tree as an ASCII tree.
+ * @param result The DependencyTraceResult for a package.
+ * @returns ASCII string representation of the nested module tree.
+ */
+export function renderModuleTreeAscii(result: import("./types").DependencyTraceResult): string {
+  function renderNode(
+    node: ModuleTreeNode,
+    prefix = "",
+    isLast = true,
+    ancestors: boolean[] = [],
+  ): string {
+    let output = "";
+    if (ancestors.length > 0) {
+      for (let i = 0; i < ancestors.length - 1; i++) {
+        output += ancestors[i] ? "│   " : "    ";
+      }
+      output += isLast ? "└── " : "├── ";
+    }
+    output += node.name + "\n";
+    const children = node.children || [];
+    children.forEach((child: ModuleTreeNode, idx: number) => {
+      const last = idx === children.length - 1;
+      output += renderNode(child, prefix, last, [...ancestors, !last]);
+    });
+    return output;
+  }
+  if (!result.moduleTree) {
+    return "(no module tree)";
+  }
+  return renderNode(result.moduleTree);
 }
 
 /**

@@ -61,6 +61,14 @@ export interface DependencyTreeNode {
 }
 
 /**
+ * Represents a node in the module tree.
+ */
+export interface ModuleTreeNode {
+  name: string; // Module name, e.g., "aptos_framework::account"
+  children: ModuleTreeNode[];
+}
+
+/**
  * The result of tracing dependencies for a package.
  */
 export interface DependencyTraceResult {
@@ -68,6 +76,7 @@ export interface DependencyTraceResult {
   dependencyList: string[]; // All dependencies (may include duplicates)
   dedupedDependencyList: string[]; // Unique dependencies
   dependencyTree: DependencyTreeNode;
+  moduleTree: ModuleTreeNode;
   directDependencyCount: number;
   allDependencyCount: number;
   dedupedDependencyCount: number;
