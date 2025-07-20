@@ -13,17 +13,7 @@ import { renderAsciiTree } from "./graph";
  * @returns JSON string.
  */
 export function formatJson(result: DependencyTraceResult): string {
-  return JSON.stringify(
-    {
-      package: result.packageId,
-      dependencyCount: result.allDependencyCount,
-      dedupedDependencyCount: result.dedupedDependencyCount,
-      dependencies: result.dedupedDependencyList,
-      dependencyTree: result.dependencyTree,
-    },
-    null,
-    2,
-  );
+  return JSON.stringify(result, null, 2);
 }
 
 /**

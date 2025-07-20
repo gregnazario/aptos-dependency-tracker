@@ -120,14 +120,19 @@ async function main() {
 
     // Output in the requested format
     let output = "";
+    let outputFile = "";
     if (options.format === "json") {
       output = formatJson(traceResult);
+      outputFile = "dependency_output.json";
     } else if (options.format === "table") {
       output = formatTable(traceResult);
+      outputFile = "dependency_output.txt";
     }
-    //console.log(output);
-    console.log(traceResult.dedupedModuleCount);
-    //console.log(JSON.stringify(traceResult.dedupedModuleList));
+
+    // Write the output to a file
+    const fs = await import("fs");
+    fs.writeFileSync(outputFile, output, "utf8");
+    console.log(`Dependency output written to ${outputFile}`);
 
     // Optionally output the dependency tree as ASCII
     if (options.tree) {
