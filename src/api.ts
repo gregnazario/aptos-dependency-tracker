@@ -3,21 +3,15 @@
  * Uses @aptos-labs/ts-sdk.
  */
 
-import {
-  OnchainDependency,
-  OnchainModule,
-  PackageMetadata,
-  PackageMetadataWithAddress,
-} from "./types";
-import { Aptos, AptosConfig, ClientConfig, Network } from "@aptos-labs/ts-sdk";
 import * as fs from "fs";
 import * as path from "path";
 
+import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
+
+import { PackageMetadata, PackageMetadataWithAddress } from "./types";
+
 // Persistent disk cache for package metadata
-export const PACKAGE_METADATA_CACHE_FILE = path.resolve(
-  process.cwd(),
-  ".package_metadata.json",
-);
+export const PACKAGE_METADATA_CACHE_FILE = path.resolve(process.cwd(), ".package_metadata.json");
 
 export let packageMetadataCache = new Map<string, PackageMetadataWithAddress>();
 
@@ -28,7 +22,8 @@ function loadPackageMetadataCache() {
       const raw = fs.readFileSync(PACKAGE_METADATA_CACHE_FILE, "utf8");
       packageMetadataCache = JSON.parse(raw);
     }
-  } catch (e) {
+  } catch (e: unknown) {
+    console.error("Failed to load package metadata cache:", e);
     packageMetadataCache = new Map();
   }
 }
@@ -42,7 +37,8 @@ export function savePackageMetadataCache() {
       JSON.stringify(packageMetadataCache, null, 2),
       "utf8",
     );
-  } catch (e) {
+  } catch (e: unknown) {
+    console.error("Failed to save package metadata cache:", e);
     // ignore
   }
 }
@@ -69,9 +65,7 @@ function getAptos(network: "mainnet" | "testnet" | "devnet") {
 /**
  * Maps CLI network string to Aptos SDK Network.
  */
-function getAptosNetwork(
-  network: "mainnet" | "testnet" | "devnet" | "local",
-): Network {
+function getAptosNetwork(network: "mainnet" | "testnet" | "devnet" | "local"): Network {
   switch (network) {
     case "mainnet":
       return Network.MAINNET;
@@ -98,14 +92,11 @@ export async function fetchPackageMetadata(
 ): Promise<PackageMetadataWithAddress> {
   const [address, name] = packageId.split("::");
   if (!address || !name) {
-    throw new Error(
-      "Invalid package ID format. Expected <address>::<PackageName>.",
-    );
+    throw new Error("Invalid package ID format. Expected <address>::<PackageName>.");
   }
 
   const cacheKey = `${network}::${address}::${name}`;
-  const cacheEntry: PackageMetadataWithAddress | undefined =
-    packageMetadataCache[cacheKey];
+  const cacheEntry: PackageMetadataWithAddress | undefined = packageMetadataCache[cacheKey];
   if (cacheEntry !== undefined) {
     return cacheEntry;
   }
@@ -116,7 +107,7 @@ export async function fetchPackageMetadata(
 
   // The resource type for the package registry
   const registryType = "0x1::code::PackageRegistry";
-  let registry: any;
+  let registry: { packages: PackageMetadata[] };
   try {
     registry = await aptos.getAccountResource<{ packages: PackageMetadata[] }>({
       accountAddress: address,
@@ -128,11 +119,9 @@ export async function fetchPackageMetadata(
 
   // Find the package entry in the registry
   const packages: PackageMetadata[] = registry?.packages || [];
-  const pkgEntry: PackageMetadata | undefined = packages.find(
-    (pkg: PackageMetadata) => {
-      return pkg.name === name;
-    },
-  );
+  const pkgEntry: PackageMetadata | undefined = packages.find((pkg: PackageMetadata) => {
+    return pkg.name === name;
+  });
 
   if (pkgEntry === undefined) {
     throw new Error(

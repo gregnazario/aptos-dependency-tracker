@@ -21,7 +21,7 @@ export interface PackageMetadata {
   name: string;
   modules: OnchainModule[];
   deps: OnchainDependency[]; // Array of package IDs, e.g., ["0x1::MoveStdlib"]
-  extension: { vec: any[] };
+  extension: { vec: unknown[] };
   manifest: string;
   source_digest: string;
   upgrade_number: string;
@@ -33,7 +33,7 @@ export interface PackageMetadataWithAddress extends PackageMetadata {
   name: string;
   modules: OnchainModule[];
   deps: OnchainDependency[]; // Array of package IDs, e.g., ["0x1::MoveStdlib"]
-  extension: { vec: any[] };
+  extension: { vec: unknown[] };
   manifest: string;
   source_digest: string;
   upgrade_number: string;
@@ -46,7 +46,7 @@ export interface OnchainDependency {
 }
 
 export interface OnchainModule {
-  extension: any;
+  extension: unknown;
   name: string;
   source: string;
   source_map: string;

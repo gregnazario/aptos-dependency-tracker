@@ -26,10 +26,7 @@ export async function traceDependencies(
   const dedupedModules = new Set<string>();
 
   // Helper to recursively build the tree
-  async function buildTree(
-    pkgId: string,
-    visited: Set<string>,
-  ): Promise<DependencyTreeNode> {
+  async function buildTree(pkgId: string, visited: Set<string>): Promise<DependencyTreeNode> {
     // Prevent cycles
     if (visited.has(pkgId)) {
       return {
@@ -46,7 +43,7 @@ export async function traceDependencies(
 
     // Track dependencies
     for (const dep of metadata.deps) {
-      let name = `${dep.account}::${dep.package_name}`;
+      const name = `${dep.account}::${dep.package_name}`;
 
       // Note dependencies by Package vs module are different
       allDependencies.push(name);
@@ -55,7 +52,7 @@ export async function traceDependencies(
 
     // Track modules
     for (const module of metadata.modules) {
-      let name = `${pkgAddress}::${module.name}`;
+      const name = `${pkgAddress}::${module.name}`;
 
       // Note dependencies by Package vs module are different
       allModules.push(name);
@@ -65,7 +62,7 @@ export async function traceDependencies(
     // Recursively build children
     const children: DependencyTreeNode[] = [];
     for (const dep of metadata.deps) {
-      let name = `${dep.account}::${dep.package_name}`;
+      const name = `${dep.account}::${dep.package_name}`;
       children.push(await buildTree(name, new Set(visited)));
     }
 

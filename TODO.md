@@ -1,4 +1,5 @@
 dependency-tracer/TODO.md
+
 # Dependency Tracer TODO Checklist
 
 A comprehensive checklist for building the Aptos Move package dependency tracer CLI tool.

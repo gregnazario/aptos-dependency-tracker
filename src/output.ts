@@ -5,7 +5,7 @@
  * Now supports combined output for multiple packages.
  */
 
-import { DependencyTraceResult, OutputFormat, TraceResult } from "./types";
+import { DependencyTraceResult, TraceResult } from "./types";
 import { renderAsciiTree } from "./graph";
 
 /**
@@ -24,6 +24,7 @@ export function formatJson(result: TraceResult): string {
  *
  * TODO: Fix with new info
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function formatTable(result: any): string {
   // If result has perPackage, it's a combined output
   if (result && Array.isArray(result.perPackage)) {
@@ -35,9 +36,9 @@ export function formatTable(result: any): string {
         (r: DependencyTraceResult) =>
           `${r.packageId.padEnd(23)}| ${String(r.directDependencyCount).padEnd(
             11,
-          )}| ${String(r.allDependencyCount).padEnd(8)}| ${String(
-            r.dedupedDependencyCount,
-          ).padEnd(12)}`,
+          )}| ${String(r.allDependencyCount).padEnd(8)}| ${String(r.dedupedDependencyCount).padEnd(
+            12,
+          )}`,
       )
       .join("\n");
     const combined =
@@ -54,9 +55,9 @@ export function formatTable(result: any): string {
     const header =
       "Package                | Direct Deps | All Deps | Deduped Deps\n" +
       "--------------------------------------------------------------";
-    const row = `${result.packageId.padEnd(23)}| ${String(
-      result.directDependencyCount,
-    ).padEnd(11)}| ${String(result.allDependencyCount).padEnd(8)}| ${String(
+    const row = `${result.packageId.padEnd(23)}| ${String(result.directDependencyCount).padEnd(
+      11,
+    )}| ${String(result.allDependencyCount).padEnd(8)}| ${String(
       result.dedupedDependencyCount,
     ).padEnd(12)}`;
     return `${header}\n${row}`;

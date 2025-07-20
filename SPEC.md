@@ -1,4 +1,5 @@
 dependency-tracer/SPEC.md
+
 # Dependency Tracer – Formal Specification
 
 ## 1. Purpose

@@ -1,4 +1,5 @@
 dependency-tracer/DESIGN.md
+
 # Dependency Tracer – Design Document
 
 ## Overview
@@ -43,12 +44,14 @@ src/
 ### Module Responsibilities
 
 #### 1. `api.ts`
+
 - Uses `@aptos-labs/ts-sdk` to fetch package metadata and dependencies from the Aptos blockchain.
 - Provides functions:
   - `fetchPackageMetadata(packageId: string): Promise<PackageMetadata>`
   - `fetchPackageDependencies(packageId: string): Promise<string[]>`
 
 #### 2. `tracer.ts`
+
 - Recursively traces dependencies for a given package.
 - Tracks:
   - All dependencies (with duplicates)
@@ -58,6 +61,7 @@ src/
   - `traceDependencies(packageId: string): Promise<DependencyTraceResult>`
 
 #### 3. `graph.ts`
+
 - Constructs a tree structure representing dependencies.
 - Renders the tree as ASCII for CLI.
 - Prepares for SVG/PNG rendering for web UI.
@@ -66,6 +70,7 @@ src/
   - `renderAsciiTree(tree: DependencyTreeNode): string`
 
 #### 4. `output.ts`
+
 - Formats results for output.
 - Supports:
   - JSON (default)
@@ -77,11 +82,13 @@ src/
   - `formatTree(tree: DependencyTreeNode): string`
 
 #### 5. `cli.ts`
+
 - Parses CLI arguments (package ID, output format).
 - Orchestrates calls to tracer and output modules.
 - Handles errors and displays results.
 
 #### 6. `types.ts`
+
 - Defines:
   - `PackageMetadata`
   - `DependencyTraceResult`
@@ -124,6 +131,7 @@ pnpm run src/cli.ts 0x1::AptosFramework
 ## Example Output
 
 ### JSON (default)
+
 ```json
 {
   "package": "0x1::AptosFramework",
@@ -148,6 +156,7 @@ pnpm run src/cli.ts 0x1::AptosFramework
 ```
 
 ### Table
+
 ```
 Package                | Direct Deps | All Deps | Deduped Deps
 --------------------------------------------------------------
@@ -155,6 +164,7 @@ Package                | Direct Deps | All Deps | Deduped Deps
 ```
 
 ### ASCII Tree
+
 ```
 0x1::AptosFramework
 ├── 0x1::MoveStdlib

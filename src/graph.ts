@@ -28,8 +28,7 @@ export function renderAsciiTree(
   output += tree.name + "\n";
 
   // Prepare prefix for children
-  const childPrefix =
-    prefix + (prefix.length > 0 ? (isLast ? "    " : "│   ") : "");
+  const childPrefix = prefix + (prefix.length > 0 ? (isLast ? "    " : "│   ") : "");
 
   // Render children
   const deps = tree.dependencies || [];
@@ -47,10 +46,7 @@ export function renderAsciiTree(
  * @param yOffset Optional vertical offset for stacking multiple trees.
  * @returns SVG string representation of the tree.
  */
-export function renderDependencyTreeSvg(
-  tree: DependencyTreeNode,
-  yOffset: number = 0,
-): string {
+export function renderDependencyTreeSvg(tree: DependencyTreeNode, yOffset: number = 0): string {
   // Simple vertical tree layout: each node is a box, children are below parent, lines connect them.
   // This is a basic implementation for small/medium trees.
 
@@ -79,7 +75,7 @@ export function renderDependencyTreeSvg(
     xOffset: number,
   ): [PositionedNode, number] {
     let width = 0;
-    let children: PositionedNode[] = [];
+    const children: PositionedNode[] = [];
     let childX = xOffset;
 
     for (const child of node.dependencies) {
@@ -94,8 +90,7 @@ export function renderDependencyTreeSvg(
     if (width === 0) width = NODE_WIDTH;
 
     // Center parent above children
-    const x =
-      children.length === 0 ? xOffset : xOffset + width / 2 - NODE_WIDTH / 2;
+    const x = children.length === 0 ? xOffset : xOffset + width / 2 - NODE_WIDTH / 2;
     const y = yOffset + depth * (NODE_HEIGHT + VERTICAL_GAP);
 
     maxX = Math.max(maxX, x + NODE_WIDTH);

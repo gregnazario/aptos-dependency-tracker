@@ -78,17 +78,11 @@ function parseArgs(argv: string[]): CLIOptions {
         i++;
         break;
       case "--network":
-        if (
-          argv[i + 1] === "mainnet" ||
-          argv[i + 1] === "testnet" ||
-          argv[i + 1] === "devnet"
-        ) {
+        if (argv[i + 1] === "mainnet" || argv[i + 1] === "testnet" || argv[i + 1] === "devnet") {
           options.network = argv[i + 1] as "mainnet" | "testnet" | "devnet";
           i += 2;
         } else {
-          console.error(
-            "Error: --network must be 'mainnet', 'testnet', or 'devnet'",
-          );
+          console.error("Error: --network must be 'mainnet', 'testnet', or 'devnet'");
           process.exit(1);
         }
         break;
@@ -176,12 +170,8 @@ async function main() {
     fs.writeFileSync(outputFile, output, "utf8");
     console.log(`Dependency output written to ${outputFile}`);
     if (options.format === "json") {
-      console.log(
-        `Combined module count: ${combinedOutput.combined.moduleCount}`,
-      );
-      console.log(
-        `Combined deduped module count: ${combinedOutput.combined.dedupedModuleCount}`,
-      );
+      console.log(`Combined module count: ${combinedOutput.combined.moduleCount}`);
+      console.log(`Combined deduped module count: ${combinedOutput.combined.dedupedModuleCount}`);
     }
 
     // Optionally output the dependency tree as ASCII (forest)
@@ -216,8 +206,8 @@ async function main() {
 
     // Write packageMetadataCache to disk
     savePackageMetadataCache();
-  } catch (err: any) {
-    console.error("Error:", err?.message || err);
+  } catch (err: unknown) {
+    console.error("Error:", err);
     process.exit(1);
   }
 }
