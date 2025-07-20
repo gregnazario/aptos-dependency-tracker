@@ -6,7 +6,7 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 
-import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
+import { Aptos, AptosApiError, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 
 import { PackageMetadata, PackageMetadataWithAddress } from "./types";
 
@@ -118,7 +118,15 @@ export async function fetchPackageMetadata(
       accountAddress: address,
       resourceType: registryType,
     });
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof AptosApiError) {
+      if (e.status == 429) {
+        // Wait for 5 seconds then retry
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        return await fetchPackageMetadata(packageId, network);
+      }
+    }
+
     throw new Error("Package not found on the specified network." + e);
   }
 
