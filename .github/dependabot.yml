@@ -5,6 +5,12 @@ updates:
     schedule:
       interval: daily
     groups:
-      dependencies:
-        patterns:
-          - "*"
+      minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+      major:
+        applies-to: version-updates
+        update-types:
+          - "major"
